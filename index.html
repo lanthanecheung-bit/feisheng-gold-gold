@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <title>飛升 Gold Gold!</title>
+  <link rel="stylesheet" href="styles.css?v=1789588500" />
+</head>
+<body>
+  <div id="app">
+    <!-- Start Screen -->
+    <section id="start-screen" class="screen active">
+      <div class="sky-decor" aria-hidden="true">
+        <span class="float-cloud c1"></span>
+        <span class="float-cloud c2"></span>
+        <span class="float-cloud c3"></span>
+        <span class="float-cloud c4"></span>
+        <span class="float-cloud c5"></span>
+        <img class="float-cherub a1" src="assets/cherubs.png?v=1789588500" alt="" aria-hidden="true" />
+        <img class="float-cherub a2" src="assets/cherubs.png?v=1789588500" alt="" aria-hidden="true" />
+        <span class="float-sparkle a3">✦</span>
+      </div>
+      <div class="mythic-frame">
+        <h1 class="title">飛升 Gold Gold!</h1>
+        <p class="subtitle">第一關 · 黃金蘋果樹之路</p>
+        <img id="start-cherubs-art" src="assets/cherubs.png?v=1789588500" alt="守護天使" class="start-art" />
+        <p class="blurb start-blurb-compact">
+          跳上 <strong>18</strong> 朵雲 · 答趣味問答 · 到達黃金蘋果樹！
+        </p>
+        <ul class="howto howto-compact">
+          <li>⏱ 180 秒 · ♡ 答錯 −1／連對 3 +1 · ⚠ 連錯 2 −5 秒 · 🪙 跳過 +1</li>
+        </ul>
+        <div class="level-select" role="group" aria-label="選關">
+          <button id="btn-start" class="btn primary">開始 · 第一關</button>
+          <button id="btn-start-l2" class="btn secondary" type="button">第二關 · 黃金海浪</button>
+          <button id="btn-start-l3" class="btn secondary" type="button">第三關 · 生命之樹</button>
+          <button id="btn-start-l4" class="btn secondary" type="button">第四關 · 黃金迷宮</button>
+        </div>
+        <p class="hint start-hint-compact">鍵盤 ← →／空白跳躍 · 可直接選關 1–4</p>
+        <p class="hint l2-menu-hint hidden" id="l2-menu-hint">可直接選關：第二關</p>
+        <p class="hint l3-menu-hint hidden" id="l3-menu-hint">可直接選關：第三關</p>
+        <p class="hint l4-menu-hint hidden" id="l4-menu-hint">可直接選關：第四關</p>
+      </div>
+    </section>
+
+    <!-- Game Screen L1 -->
+    <section id="game-screen" class="screen">
+      <header id="hud">
+        <div class="hud-item">
+          <span class="hud-label">倒數</span>
+          <span id="timer" class="hud-value">180</span>
+        </div>
+        <div class="hud-item">
+          <span class="hud-label">雲朵</span>
+          <span id="cloud-progress" class="hud-value">1 / 18</span>
+        </div>
+        <div class="hud-item lives">
+          <span class="hud-label">♡ 生命</span>
+          <span id="lives" class="hud-value hearts">♡♡♡</span>
+        </div>
+        <div class="hud-item">
+          <span class="hud-label">金幣</span>
+          <span id="coins" class="hud-value">0</span>
+        </div>
+        <div class="hud-item streak">
+          <span class="hud-label">連對</span>
+          <span id="streak" class="hud-value">0 / 3</span>
+        </div>
+      </header>
+
+      <div id="stage-wrap">
+        <canvas id="game-canvas" width="960" height="540"></canvas>
+        <div id="touch-controls">
+          <button type="button" id="btn-left" class="ctrl-btn" aria-label="左">◀</button>
+          <button type="button" id="btn-jump" class="ctrl-btn jump" aria-label="跳躍">跳躍</button>
+          <button type="button" id="btn-right" class="ctrl-btn" aria-label="右">▶</button>
+        </div>
+      </div>
+
+      <div id="quiz-panel" class="overlay hidden" role="dialog" aria-modal="true">
+        <div class="quiz-card">
+          <p class="quiz-eyebrow">答題 · 雲朵 <span id="quiz-cloud-num">2</span></p>
+          <h2 id="quiz-question" class="quiz-q">?</h2>
+          <div id="quiz-choices" class="choices"></div>
+          <p id="quiz-feedback" class="quiz-feedback"></p>
+        </div>
+      </div>
+
+      <div id="fail-toast" class="toast hidden"></div>
+    </section>
+
+    <!-- Win Screen L1 -->
+    <section id="win-screen" class="screen">
+      <div class="sky-decor" aria-hidden="true">
+        <span class="float-cloud c2"></span>
+        <span class="float-cloud c4"></span>
+        <img class="float-cherub a1" src="assets/cherubs.png?v=1789588500" alt="" aria-hidden="true" />
+        <span class="float-sparkle a2">✦</span>
+      </div>
+      <div class="mythic-frame win">
+        <h1 class="title gold">勝利！</h1>
+        <img id="win-cherubs-art" src="assets/cherubs.png?v=1789588500" alt="守護天使" class="win-art" />
+        <p class="win-msg">你到達了黃金蘋果樹！</p>
+        <p class="coin-award">🪙 獲得 <span id="win-coins">18</span> 金幣</p>
+        <p class="win-hearts">♡ 剩餘生命 <span id="win-hearts">3</span> · 已儲存生命力，留待第二關</p>
+        <p class="win-sub">小天使們為你歡呼～即將自動進入第二關海上衝浪！</p>
+        <p class="win-sub hidden" id="l1-auto-l2-note">正在進入第二關…</p>
+        <button id="btn-enter-l2" class="btn primary" type="button">立即進入第二關</button>
+        <button id="btn-replay-win" class="btn secondary" type="button">再試一次 · 第一關</button>
+      </div>
+    </section>
+
+    <!-- Lose Screen L1 -->
+    <section id="lose-screen" class="screen">
+      <div class="mythic-frame lose">
+        <h1 class="title">時間到 / 挑戰失敗</h1>
+        <p class="lose-msg" id="lose-reason">再試一次，加油！</p>
+        <button id="btn-replay-lose" class="btn primary">再試一次</button>
+        <button id="btn-home" class="btn secondary">開始</button>
+      </div>
+    </section>
+
+    <!-- ========== Level 2 ========== -->
+    <section id="level2-screen" class="screen ocean-theme">
+      <header id="hud-l2">
+        <div class="hud-item lives">
+          <span class="hud-label">♡ 生命</span>
+          <span id="l2-lives" class="hud-value hearts">♡♡♡</span>
+        </div>
+        <div class="hud-item">
+          <span class="hud-label">金幣</span>
+          <span id="l2-coins" class="hud-value">0</span>
+        </div>
+        <div class="hud-item">
+          <span class="hud-label">航程</span>
+          <span id="l2-progress" class="hud-value">0%</span>
+        </div>
+        <div class="hud-item balance-item">
+          <span class="hud-label" id="l2-balance-label">平衡</span>
+          <div class="balance-bar" title="衝浪平衡">
+            <div id="l2-balance-fill" class="balance-fill ok"></div>
+          </div>
+        </div>
+      </header>
+
+      <div id="stage-wrap-l2">
+        <canvas id="level2-canvas" width="1280" height="640"></canvas>
+                <div id="touch-controls-l2">
+          <button type="button" id="btn-l2-left" class="ctrl-btn" aria-label="向上閃避">▲</button>
+          <button type="button" id="btn-l2-right" class="ctrl-btn" aria-label="向下閃避">▼</button>
+          <button type="button" id="btn-l2-aim-up" class="ctrl-btn aim" aria-label="箭嘴向上">➶</button>
+          <button type="button" id="btn-l2-shoot" class="ctrl-btn shoot" aria-label="直射">射擊</button>
+          <button type="button" id="btn-l2-aim-down" class="ctrl-btn aim" aria-label="箭嘴向下">➴</button>
+        </div>
+      </div>
+
+      <div id="l2-fail-toast" class="toast hidden"></div>
+      <p class="l2-hint-strip">▲▼ 閃避 · ➶➴ 瞄準直射 · 白海貝珍珠拾取 +1秒射擊效果（連射／三箭） · 射中加金幣</p>
+    </section>
+
+    <!-- Win Screen L2 -->
+    <section id="win-screen-l2" class="screen ocean-theme">
+      <div class="mythic-frame win gold-win">
+        <h1 class="title gold">黃金戰士誕生！</h1>
+        <div class="armor-preview-wrap">
+          <img id="l2-armor-img" class="armor-preview" src="assets/angel-boy-gold.png?v=1789588500" alt="黃金聖鬥士天使（鎧甲穿在身上）" width="280" height="420" />
+          <canvas id="l2-armor-preview" width="320" height="280" class="armor-preview armor-preview-canvas hidden" aria-hidden="true"></canvas>
+        </div>
+        <p class="win-msg">獲得 <strong>黃金戰士套裝</strong>！天使化身<strong>黃金聖鬥士</strong>！</p>
+        <p class="coin-award">🪙 金幣 <span id="l2-win-coins">0</span> · ♡ 生命 <span id="l2-win-hearts">3</span></p>
+        <p class="win-sub">你已衝上黃金島城，金光閃耀！通關後會直接進入第三關生命之樹。</p>
+        <p class="win-sub hidden" id="l2-auto-l3-note">正在進入第三關…</p>
+        <button id="btn-enter-l3" class="btn primary" type="button">進入第三關</button>
+        <button id="btn-replay-l2" class="btn secondary" type="button">再玩第二關</button>
+        <button id="btn-home-l2" class="btn secondary" type="button">回主選單</button>
+      </div>
+    </section>
+
+    <!-- Lose Screen L2 -->
+    <section id="lose-screen-l2" class="screen ocean-theme">
+      <div class="mythic-frame lose">
+        <h1 class="title">墮海失敗</h1>
+        <p class="lose-msg" id="l2-lose-reason">再試一次，加油！</p>
+        <button id="btn-replay-l2-lose" class="btn primary" type="button">再試一次</button>
+        <button id="btn-home-l2-lose" class="btn secondary" type="button">回主選單</button>
+      </div>
+    </section>
+
+    <!-- ========== Level 3 ========== -->
+    <section id="level3-screen" class="screen tree-theme">
+      <header id="hud-l3">
+        <div class="hud-item">
+          <span class="hud-label">倒數</span>
+          <span id="l3-timer" class="hud-value">5:00</span>
+        </div>
+        <div class="hud-item lives">
+          <span class="hud-label">♡ 生命</span>
+          <span id="l3-lives" class="hud-value hearts">♡♡♡</span>
+        </div>
+        <div class="hud-item">
+          <span class="hud-label">高度</span>
+          <span id="l3-progress" class="hud-value">0%</span>
+        </div>
+        <div class="hud-item">
+          <span class="hud-label">金磚</span>
+          <span id="l3-bricks" class="hud-value">0</span>
+        </div>
+        <div class="hud-item">
+          <span class="hud-label">金幣</span>
+          <span id="l3-coins" class="hud-value">0</span>
+        </div>
+      </header>
+
+      <div id="stage-wrap-l3">
+        <canvas id="level3-canvas" width="960" height="640"></canvas>
+        <div id="touch-controls-l3">
+          <button type="button" id="btn-l3-left" class="ctrl-btn" aria-label="左移砌磚">◀</button>
+          <button type="button" id="btn-l3-up" class="ctrl-btn" aria-label="向上">▲</button>
+          <button type="button" id="btn-l3-down" class="ctrl-btn" aria-label="向下">▼</button>
+          <button type="button" id="btn-l3-right" class="ctrl-btn" aria-label="右移砌磚">▶</button>
+          <button type="button" id="btn-l3-build" class="ctrl-btn build" aria-label="砌磚">砌磚</button>
+        </div>
+      </div>
+
+      <div id="l3-fail-toast" class="toast hidden"></div>
+      <p class="l3-hint-strip">▲▼攀爬 · ◀▶繞障 · 樹枝金蘋果補♡ · 30%↑樹洞 · 60%↑樹枝 · 80%↑連樹洞 · 空白砌磚</p>
+    </section>
+
+    <!-- Win Screen L3 -->
+    <section id="win-screen-l3" class="screen tree-theme">
+      <div class="mythic-frame win gold-win">
+        <h1 class="title gold">永恆生命！</h1>
+        <p class="win-msg">你攀上生命之樹頂，進入黃金宮殿，飲下<strong>永恆生命泉水</strong>！</p>
+        <p class="coin-award">🪙 金幣 <span id="l3-win-coins">0</span> · ♡ 生命 <span id="l3-win-hearts">3</span></p>
+        <p class="win-sub">天使獲得永恆生命，金光環繞～即將進入第四關黃金迷宮！</p>
+        <p class="win-sub hidden" id="l3-auto-l4-note">正在進入第四關…</p>
+        <button id="btn-enter-l4" class="btn primary" type="button">進入第四關</button>
+        <button id="btn-replay-l3" class="btn secondary" type="button">再玩第三關</button>
+        <button id="btn-home-l3" class="btn secondary" type="button">回主選單</button>
+      </div>
+    </section>
+
+    <!-- Lose Screen L3 -->
+    <section id="lose-screen-l3" class="screen tree-theme">
+      <div class="mythic-frame lose">
+        <h1 class="title">墮下失敗</h1>
+        <p class="lose-msg" id="l3-lose-reason">再試一次，加油！</p>
+        <button id="btn-replay-l3-lose" class="btn primary" type="button">再試一次</button>
+        <button id="btn-home-l3-lose" class="btn secondary" type="button">回主選單</button>
+      </div>
+    </section>
+
+    <!-- ========== Level 4 ========== -->
+    <section id="level4-screen" class="screen palace-theme">
+            <header id="hud-l4">
+        <!-- 固定兩排 -->
+        <div class="hud-l4-row hud-l4-row-stats" aria-label="狀態">
+          <div class="hud-item"><span class="hud-label">⏱</span><span id="l4-timer" class="hud-value">5:00</span></div>
+          <div class="hud-item lives"><span id="l4-lives" class="hud-value hearts">♡♡♡</span></div>
+          <div class="hud-item"><span class="hud-label">🪙</span><span id="l4-coins" class="hud-value">0</span></div>
+          <div class="hud-item"><span class="hud-label">💎</span><span id="l4-diamonds" class="hud-value">0</span></div>
+        </div>
+        <div class="hud-l4-row hud-l4-row-tools" aria-label="工具">
+          <div class="hud-item l4-tool-chip">
+            <span class="chip-ico">🔨</span><span id="l4-hammers" class="hud-value">0</span>
+            <button type="button" id="btn-l4-buy-hammer" class="peek-btn hammer-buy-btn" title="用 1♡ 換一把金手搥（3 次）">−1♡</button>
+          </div>
+          <div class="hud-item l4-tool-chip">
+            <span class="chip-ico">鑽</span><span id="l4-drills" class="hud-value">0</span>
+            <button type="button" id="btn-l4-buy-drill" class="peek-btn drill-buy-btn" title="用 1♡ 換一把破牆鑽（3 次）">−1♡</button>
+            <button type="button" id="btn-l4-drill" class="peek-btn drill-btn" title="鑿面前一格實牆（快捷鍵 F）">鑿</button>
+          </div>
+          <div class="hud-item l4-tool-chip">
+            <span class="chip-ico">💣</span><span id="l4-bombs" class="hud-value">0</span>
+            <button type="button" id="btn-l4-place-bomb" class="peek-btn bomb-btn" title="放炸彈喺腳下通道（快捷鍵 B）">放</button>
+          </div>
+          <div class="hud-item l4-tool-chip l4-peek-hud">
+            <span class="chip-ico">窺</span>
+            <div class="l4-peek-btns">
+              <button type="button" id="btn-l4-peek-nw" class="peek-btn" title="西北 −1♡">↖</button>
+              <button type="button" id="btn-l4-peek-ne" class="peek-btn" title="東北 −1♡">↗</button>
+              <button type="button" id="btn-l4-peek-sw" class="peek-btn" title="西南 −1♡">↙</button>
+              <button type="button" id="btn-l4-peek-se" class="peek-btn" title="東南 −1♡">↘</button>
+            </div>
+          </div>
+          <div class="hud-item l4-compass-hud" id="l4-compass" aria-label="羅盤">
+            <div class="compass-ring" title="指南針">
+              <span class="compass-n">N</span>
+              <span class="compass-e">E</span>
+              <span class="compass-s">S</span>
+              <span class="compass-w">W</span>
+              <div id="l4-compass-needle" class="compass-needle"></div>
+            </div>
+            <span id="l4-compass-label" class="compass-label">W</span>
+          </div>
+        </div>
+      </header>
+
+      <div id="stage-wrap-l4">
+        <canvas id="level4-canvas" width="960" height="640"></canvas>
+        <div id="touch-controls-l4">
+          <button type="button" id="btn-l4-left" class="ctrl-btn" aria-label="左">◀</button>
+          <button type="button" id="btn-l4-up" class="ctrl-btn" aria-label="上">▲</button>
+          <button type="button" id="btn-l4-down" class="ctrl-btn" aria-label="下">▼</button>
+          <button type="button" id="btn-l4-right" class="ctrl-btn" aria-label="右">▶</button>
+          <button type="button" id="btn-l4-drill-pad" class="ctrl-btn drill-pad" aria-label="鑿實牆">鑽</button>
+          <button type="button" id="btn-l4-bomb-pad" class="ctrl-btn bomb-pad" aria-label="放炸彈">彈</button>
+        </div>
+      </div>
+
+      <div id="l4-fail-toast" class="toast hidden"></div>
+      <p class="l4-hint-strip">💣途中炸彈·放通道炸停牛10秒 · 🔨／鑽/−1♡ · 生命寶箱 · 窺 · 出口</p>
+    </section>
+
+    <!-- Win Screen L4 -->
+    <section id="win-screen-l4" class="screen palace-theme">
+      <div class="mythic-frame win gold-win">
+        <h1 class="title gold">金鎖匙到手！</h1>
+        <img id="l4-win-chariot" class="l4-chariot-prize" src="assets/sky-chariot.png?v=1789588500" alt="巡天飛天馬車" width="360" height="200" />
+        <img id="l4-win-key" class="l4-key-prize" src="assets/sky-chariot-gold-key.png?v=1789588500" alt="金鎖匙 · 巡天飛天馬車" width="320" height="160" />
+        <p class="win-msg">你逃出黃金宮殿迷宮，奪得<strong>金鎖匙</strong>！</p>
+        <p class="win-sub key-prize-note">這把<strong>金鎖匙</strong>可操控<strong>巡天飛天馬車</strong>，遨遊天際～</p>
+        <p class="coin-award">🪙 金幣 <span id="l4-win-coins">0</span> · ♡ 生命 <span id="l4-win-hearts">3</span></p>
+        <p class="win-sub">封印退路的勇氣，成就真正的黃金天使～</p>
+        <button id="btn-replay-l4" class="btn primary" type="button">再玩第四關</button>
+        <button id="btn-home-l4" class="btn secondary" type="button">回主選單</button>
+      </div>
+    </section>
+
+    <!-- Lose Screen L4 -->
+    <section id="lose-screen-l4" class="screen palace-theme">
+      <div class="mythic-frame lose">
+        <h1 class="title">迷宮失敗</h1>
+        <p class="lose-msg" id="l4-lose-reason">再試一次，加油！</p>
+        <button id="btn-replay-l4-lose" class="btn primary" type="button">再試一次</button>
+        <button id="btn-home-l4-lose" class="btn secondary" type="button">回主選單</button>
+      </div>
+    </section>
+
+  </div>
+  <script src="questions.js?v=1789588500"></script>
+  <script src="game.js?v=1789588500"></script>
+  <script src="level2.js?v=1789588500"></script>
+  <script src="level3.js?v=1789588500"></script>
+  <script src="level4.js?v=1789588500"></script>
+</body>
+</html>
